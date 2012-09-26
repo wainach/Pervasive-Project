@@ -1,0 +1,110 @@
+<!--
+ * Project: Bearing
+ * Copyright (C) 2009 ralfoide gmail com,
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<html>
+<head>
+  <title>About Bearing</title>
+</head>
+<body>
+
+<img src="file:///android_asset/app_icon.png" align="right" />
+<b><a href="http://bearing.googlecode.com">Bearing</a></b>
+is a simple application that remembers one GPS location and then computes
+the bearing and distance between that specific location and your current
+GPS location.
+<br/>
+It's also displays the current compass value.
+<p/>
+That's all there is, really.
+<p/>
+<b>What is this good for?</b> I use it for land survey: walk to a particular
+point, mark the GPS location and then walk towards the next point and
+note the bearing and distance between the two points. There are some
+caveats when doing so, mostly GPS accuracy and update interval, but
+it's a good start.
+<p/>
+<b>What this is not?</b> This is not a game.
+There are no fancy graphics, not even a graphical display of the
+compass. There are just a bunch of techy numbers and some cryptic
+text display.
+<p/>
+
+The various text fields displayed are as follow:
+<p/>
+<b>Mark Location</b>:
+    <ul>
+    <li>GPS coordinates of the marked location,</li>
+    <li>Bearing to current location in degrees,</li>
+    <li>Distance to current location in feet.</li>
+    </ul>
+<b>Current location</b>:
+    <ul>
+    <li>GPS coordinates,</li>
+    <li>GPS accuracy (meters and feet),</li>
+    <li>GPS bearing and GPS speed (only useful if you're moving at more than 5 mph).</li>
+    <li>It also displays two time delays: the numbers of seconds elapsed since the
+    last GPS coordinate update and the numbers of seconds for the previous update.
+    This is enough to give you an idea of how often the GPS updates and thus if
+    the value is stale or fresh.</li>
+    </ul>
+<b>Compass</b>:
+    <ul>
+    <li>Heading in degrees,</li>
+    <li>Average of the last 20 samples,</li>
+    <li>Accuracy (high, medium, low).</li>
+    </ul>
+<b>GPS status</b>: started vs stopped, last fix time stamp, number of satellites.
+
+<p/>
+There are two buttons on the screen:
+<ul>
+<li>The <b>Mark Loc</b>ation button lets you mark the current GPS location.
+The location is saved in permanent storage and will be recalled when the app
+is next started (useful if your phone looses its battery or such.)
+</li>
+<li>The <b>Compass</b> button launches the <em>GPS Status</em> application.
+This is a 3rd-party application available on Market. It must be installed for
+this feature to work.
+Follow this <a href="market://search?q=pname:com.eclipsim.gpsstatus2">link to
+GPS Status on Market</a> to install it.
+</li>
+</ul>
+
+<!-- .............. -->
+
+<h2>Credits</h2>
+
+<ul>
+<li>Code: <a href="http://www.alfray.com/">Ralf</a>.
+</li>
+<li>Compass, My Location &amp; Help icon from Android 1.5_r3 resources (Apache 2 license).
+</li>
+<li>Sources are available on the <a href="http://bearing.googlecode.com">Bearing Project Page</a>.
+</li>
+</ul>
+
+<center>
+<hr width="40%"/>
+<font size="-2">
+Version
+<script type="text/javascript">
+    document.write(JSAppVersion.longVersion());
+</script>
+</font></center>
+
+</body>
+</html>

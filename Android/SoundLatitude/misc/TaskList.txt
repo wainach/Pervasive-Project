@@ -1,0 +1,15 @@
+Bearing TaskList
+----------------
+
+TODO
+
+
+
+----
+Done for 0.2
+
+20100118 0.2.0 on Market
+20100118 Pref for metric units
+
+
+Done for 0.1

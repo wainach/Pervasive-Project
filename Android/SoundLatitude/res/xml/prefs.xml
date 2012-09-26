@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ * Project: Bearing
+ * Copyright (C) 2009 ralfoide gmail com,
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <CheckBoxPreference
+        android:key="dismiss_intro"
+        android:defaultValue="false"
+        android:title="@string/prefs_dismiss_intro_label"
+        android:summaryOn="@string/prefs_dismiss_intro_on"
+        android:summaryOff="@string/prefs_dismiss_intro_off"
+        />
+    <CheckBoxPreference
+        android:key="metric_units"
+        android:defaultValue="@string/prefs_units_metric_default"
+        android:title="@string/prefs_units_label"
+        android:summaryOn="@string/prefs_units_metric_on"
+        android:summaryOff="@string/prefs_units_metric_off"
+        />
+
+    <CheckBoxPreference
+        android:title="Confirm Mark Loc"
+        android:summaryOn="Request confirmation before marking new location"
+        android:defaultValue="true"
+        android:key="confirm_mark"
+        android:summaryOff="Does not request confirmation before marking new location"
+    />
+
+</PreferenceScreen>

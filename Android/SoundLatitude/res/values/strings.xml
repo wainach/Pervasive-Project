@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ * Project: Bearing
+ * Copyright (C) 2009 ralfoide gmail com,
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<resources>
+    <string name="app_name">Bearing</string>
+
+    <!-- menu -->
+
+    <string name="menu_mark_loc">Mark Location</string>
+    <string name="menu_compass">Open Compass</string>
+    <string name="menu_settings">Settings</string>
+    <string name="menu_about">Help &amp; About</string>
+
+    <!-- intro -->
+
+    <string name="intro_title">Bearing %s - Introduction</string>
+    <string name="intro_button_continue">Continue</string>
+    <string name="intro_checkbox_dont_display_again">Don\'t display again</string>
+
+    <!-- prefs -->
+
+    <string name="prefs_title">Bearing - Preferences</string>
+
+    <string name="prefs_dismiss_intro_label">Don\'t display introduction</string>
+    <string name="prefs_dismiss_intro_on">Introduction is skipped.</string>
+    <string name="prefs_dismiss_intro_off">Introduction is visible.</string>
+
+    <string name="prefs_units_label">Use Metric Units</string>
+    <string name="prefs_units_metric_off">Uses imperial units</string>
+    <string name="prefs_units_metric_on">Uses metric units</string>
+
+</resources>

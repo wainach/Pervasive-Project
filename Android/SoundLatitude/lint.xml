@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <issue id="HardcodedText">
+        <ignore path="res\layout\main.xml" />
+    </issue>
+    <issue id="InefficientWeight" severity="ignore" />
+    <issue id="NestedWeights">
+        <ignore path="res\layout\intro.xml" />
+    </issue>
+</lint>
