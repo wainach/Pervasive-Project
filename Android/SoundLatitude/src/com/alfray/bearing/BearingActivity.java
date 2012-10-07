@@ -525,23 +525,29 @@ public class BearingActivity extends Activity {
     public void updateCompass() {
         StringBuilder sb = new StringBuilder();
 
+        // VI HAR IKKE BRUG FOR BEARING?
+        
         // Recalc compass values
-        if(mOrientation != 0 && mOrientation > 180) mOrientation = mOrientation - 360;
+        //if(mOrientation != 0 && mOrientation > 180) mOrientation = mOrientation - 360;
         // Calc degrees from orientation in relation to bearing
         float dir = 0;
         if(mCurrentLocation != null) {
-        	dir = mCurrentLocation.bearingTo(mMarkedLocation) - mOrientation;
-        	// to openal values
-        	//dir /= 10;
+        	dir = mOrientation - mCurrentLocation.bearingTo(mMarkedLocation);
+        	
         	// update sound position
-        	Log.i("Latitude Difference", Double.toString((mCurrentLocation.getLatitude()-mMarkedLocation.getLatitude())*5000));
-        	Log.i("Longitude Difference", Double.toString((mCurrentLocation.getLongitude()-mMarkedLocation.getLongitude())*5000));
-        	this.lake1.setPosition((float)mMarkedLocation.getLatitude()*5000,(float)mMarkedLocation.getLongitude()*5000,0);
-        	this.env.setListenerPos((float)mCurrentLocation.getLatitude()*5000, (float)mCurrentLocation.getLongitude()*5000, 0);
-        	//this.env.setListenerPos(0, 0, 0);
-        	//Log.i("Direction", Float.toString(dir));
-        	this.env.setListenerOrientation(dir);
-        	//this.env.setListenerOrientation(-45);
+        	// longitude (x position in 2d)
+        	// latitude (y position in 2d)
+        	
+        	Log.i("Current location (lat,long): ", Double.toString(mCurrentLocation.getLatitude())+", "+Double.toString(mCurrentLocation.getLongitude()));
+        	Log.i("Marked location (lat,long): ", Double.toString(mMarkedLocation.getLatitude())+", "+Double.toString(mMarkedLocation.getLongitude()));
+        	
+        	this.lake1.setPosition((float)mMarkedLocation.getLongitude()*500,(float)mMarkedLocation.getLatitude()*500, 0);
+        	this.env.setListenerPos((float)mCurrentLocation.getLongitude()*500, (float)mCurrentLocation.getLatitude()*500, 0);
+        	
+        	//this.lake1.setPosition(30,-17,0);
+        	//this.env.setListenerPos(30,-17,0);
+        	
+        	this.env.setListenerOrientation(mOrientation);
         }
         
         sb.append("------ Compass -----\n");
