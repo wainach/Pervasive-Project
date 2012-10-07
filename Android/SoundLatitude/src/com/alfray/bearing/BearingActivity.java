@@ -161,7 +161,7 @@ public class BearingActivity extends Activity {
 			this.lake1 = env.addSource(lake);
 
 			// Now we spread the sounds throughout the sound room.
-			this.lake1.setPosition(0,-10,0);
+			this.lake1.setPosition(0,0,0);
 
 			// and change the pitch of the second lake.
 			//this.lake1.setPitch(1.1f);
@@ -534,8 +534,10 @@ public class BearingActivity extends Activity {
         	// to openal values
         	//dir /= 10;
         	// update sound position
-        	this.env.setListenerPos(0, 0, 0);
-        	this.env.setListenerOrientation(0,0,dir);
+        	this.lake1.setPosition((float)mMarkedLocation.getLatitude(),(float)mMarkedLocation.getLongitude(),0);
+        	this.env.setListenerPos((float)mCurrentLocation.getLatitude(), (float)mCurrentLocation.getLongitude(), 0);
+        	//this.env.setListenerPos(0, 0, 0);
+        	//this.env.setListenerOrientation(0,0,dir);
         }
         
         sb.append("------ Compass -----\n");
