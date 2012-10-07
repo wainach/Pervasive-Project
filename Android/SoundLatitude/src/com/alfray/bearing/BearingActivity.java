@@ -534,10 +534,14 @@ public class BearingActivity extends Activity {
         	// to openal values
         	//dir /= 10;
         	// update sound position
-        	this.lake1.setPosition((float)mMarkedLocation.getLatitude(),(float)mMarkedLocation.getLongitude(),0);
-        	this.env.setListenerPos((float)mCurrentLocation.getLatitude(), (float)mCurrentLocation.getLongitude(), 0);
+        	Log.i("Latitude Difference", Double.toString((mCurrentLocation.getLatitude()-mMarkedLocation.getLatitude())*5000));
+        	Log.i("Longitude Difference", Double.toString((mCurrentLocation.getLongitude()-mMarkedLocation.getLongitude())*5000));
+        	this.lake1.setPosition((float)mMarkedLocation.getLatitude()*5000,(float)mMarkedLocation.getLongitude()*5000,0);
+        	this.env.setListenerPos((float)mCurrentLocation.getLatitude()*5000, (float)mCurrentLocation.getLongitude()*5000, 0);
         	//this.env.setListenerPos(0, 0, 0);
-        	//this.env.setListenerOrientation(0,0,dir);
+        	//Log.i("Direction", Float.toString(dir));
+        	this.env.setListenerOrientation(dir);
+        	//this.env.setListenerOrientation(-45);
         }
         
         sb.append("------ Compass -----\n");
