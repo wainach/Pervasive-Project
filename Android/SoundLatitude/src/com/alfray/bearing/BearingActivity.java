@@ -57,7 +57,7 @@ public class BearingActivity extends Activity {
 	private final static String	TAG	= "BearingSoundCombi";
 	
     // For debugging and taking screenshots
-    private static boolean DEBUG_LOC = true;
+    private static boolean DEBUG_LOC = false;
 
     private static final int PREFS_DONE = 100;
 
@@ -337,7 +337,7 @@ public class BearingActivity extends Activity {
             }
 
             if (mGpsProv == null && mLocMan != null) {
-                mGpsProv = mLocMan.getProvider(LocationManager.GPS_PROVIDER);
+                mGpsProv = mLocMan.getProvider(LocationManager.NETWORK_PROVIDER); // GPS_PROVIDER for more precision
             }
 
             if (mLocMan != null) {
@@ -345,7 +345,7 @@ public class BearingActivity extends Activity {
                 mLocMan.addGpsStatusListener(mGpsStatusListener);
 
                 mGpsLocListener = new GpsLocationListener();
-                mLocMan.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+                mLocMan.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, // GPS_PROVIDER for more precision
                                 1000 /* minTime ms */,
                                 1 /* minDistance in meters */,
                                 mGpsLocListener);
@@ -530,16 +530,16 @@ public class BearingActivity extends Activity {
         // Recalc compass values
         //if(mOrientation != 0 && mOrientation > 180) mOrientation = mOrientation - 360;
         // Calc degrees from orientation in relation to bearing
-        float dir = 0;
-        if(mCurrentLocation != null) {
-        	dir = mOrientation - mCurrentLocation.bearingTo(mMarkedLocation);
+        //float dir = 0;
+        if(mCurrentLocation != null && mMarkedLocation != null) {
+        	//dir = mOrientation - mCurrentLocation.bearingTo(mMarkedLocation);
         	
         	// update sound position
         	// longitude (x position in 2d)
         	// latitude (y position in 2d)
         	
-        	Log.i("Current location (lat,long): ", Double.toString(mCurrentLocation.getLatitude())+", "+Double.toString(mCurrentLocation.getLongitude()));
-        	Log.i("Marked location (lat,long): ", Double.toString(mMarkedLocation.getLatitude())+", "+Double.toString(mMarkedLocation.getLongitude()));
+        	//Log.i("Current location (lat,long): ", Double.toString(mCurrentLocation.getLatitude())+", "+Double.toString(mCurrentLocation.getLongitude()));
+        	//Log.i("Marked location (lat,long): ", Double.toString(mMarkedLocation.getLatitude())+", "+Double.toString(mMarkedLocation.getLongitude()));
         	
         	this.lake1.setPosition((float)mMarkedLocation.getLongitude()*500,(float)mMarkedLocation.getLatitude()*500, 0);
         	this.env.setListenerPos((float)mCurrentLocation.getLongitude()*500, (float)mCurrentLocation.getLatitude()*500, 0);
@@ -548,11 +548,21 @@ public class BearingActivity extends Activity {
         	//this.env.setListenerPos(30,-17,0);
         	
         	this.env.setListenerOrientation(mOrientation);
+        	
+        	sb.append("------ OpenAL ------\n");
+        	sb.append(String.format("Sound pos: %.1f; %.1f; 0\nListener pos: %.1f; %.1f; 0\nOrientation: %.1f\n\n",
+        			mMarkedLocation.getLongitude()*500,mMarkedLocation.getLatitude()*500,
+        			mCurrentLocation.getLongitude()*500,mCurrentLocation.getLatitude()*500,
+        			mOrientation));
+            /*sb.append(String.format("Sound pos: %.1d ; %.1d\nListener pos: %.1d ; %.1d\nOrientation: %.1d",
+            		mMarkedLocation.getLongitude()*500,mMarkedLocation.getLatitude()*500,
+            		mCurrentLocation.getLongitude()*500, mCurrentLocation.getLatitude()*500,
+            		mOrientation));*/
         }
         
         sb.append("------ Compass -----\n");
-        sb.append(String.format("Heading: %.1f° (avg %.1f°, %s), direction(new) %.1f",
-                        mOrientation, mOrientation2, mOrientAccuracy, dir));
+        sb.append(String.format("Heading: %.1f° (avg %.1f°, %s)",
+                        mOrientation, mOrientation2, mOrientAccuracy));
 
         long ts = (System.currentTimeMillis() - mLastOrientTS) / 1000;
         if (mLastOrientTS > 0 && ts > 2) {
