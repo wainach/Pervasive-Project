@@ -57,7 +57,7 @@ public class BearingActivity extends Activity {
 	private final static String	TAG	= "BearingSoundCombi";
 	
     // For debugging and taking screenshots
-    private static boolean DEBUG_LOC = false;
+    private static boolean DEBUG_LOC = true;
 
     private static final int PREFS_DONE = 100;
 
@@ -150,7 +150,7 @@ public class BearingActivity extends Activity {
 			 * copy them into the assets folder of the Android project.
 			 * Currently only mono .wav files are supported.
 			 */
-			Buffer lake = env.addBuffer("lake");
+			Buffer lake = env.addBuffer("submarine2");
 
 			/*
 			 * To actually play a sound and place it somewhere in the sound
@@ -525,14 +525,44 @@ public class BearingActivity extends Activity {
     public void updateCompass() {
         StringBuilder sb = new StringBuilder();
 
-        // VI HAR IKKE BRUG FOR BEARING?
+        // new bearing value
+        float bearingAngle = 0;
         
-        // Recalc compass values
-        //if(mOrientation != 0 && mOrientation > 180) mOrientation = mOrientation - 360;
-        // Calc degrees from orientation in relation to bearing
-        //float dir = 0;
         if(mCurrentLocation != null && mMarkedLocation != null) {
-        	//dir = mOrientation - mCurrentLocation.bearingTo(mMarkedLocation);
+        	
+        	// bearing angle from magnetic north (interval -180 to 180)
+        	bearingAngle = mCurrentLocation.bearingTo(mMarkedLocation);
+            
+        	// difference from compass value (interval out 0 to 360)
+            float dir = (mOrientation - bearingAngle) - bearingAngle;
+            if(dir >= 360) dir = dir - 360;
+            
+            Log.i("DIRECTION", Float.toString(dir));
+            
+            // check for back or front and adjust gain (vol)
+            float max = 1;
+            float min = 0.2f;
+            float dirStart = 30;
+            float dirEnd = 350;
+            // example formula
+            // factor R = (20 - 10) / (6 - 2)
+            // gain y = (x - 2) * R + 10
+            // right side
+            if(dir > dirStart && dir < 180) {
+            	float R = (min - max) / (180 - dirStart);
+            	float gain = (dir - dirStart) * R + max;
+            	Log.i("GAIN RIGHT", Float.toString(gain));
+            	lake1.setGain(gain);
+            }
+            // left side
+            else if(dir > 180 && dir < dirEnd) {
+            	float R = (min - max) / (180 - dirEnd);
+            	float gain = (dir - dirEnd) * R + max;
+            	Log.i("GAIN LEFT", Float.toString(gain));
+            	lake1.setGain(gain);
+            }
+            // we are on our way
+            else lake1.setGain(1);
         	
         	// update sound position
         	// longitude (x position in 2d)
@@ -541,23 +571,19 @@ public class BearingActivity extends Activity {
         	//Log.i("Current location (lat,long): ", Double.toString(mCurrentLocation.getLatitude())+", "+Double.toString(mCurrentLocation.getLongitude()));
         	//Log.i("Marked location (lat,long): ", Double.toString(mMarkedLocation.getLatitude())+", "+Double.toString(mMarkedLocation.getLongitude()));
         	
+            // TODO: factor? hardcoded 500 currently
         	this.lake1.setPosition((float)mMarkedLocation.getLongitude()*500,(float)mMarkedLocation.getLatitude()*500, 0);
         	this.env.setListenerPos((float)mCurrentLocation.getLongitude()*500, (float)mCurrentLocation.getLatitude()*500, 0);
         	
-        	//this.lake1.setPosition(30,-17,0);
-        	//this.env.setListenerPos(30,-17,0);
-        	
+        	// listener orientation is the compass orientation
         	this.env.setListenerOrientation(mOrientation);
         	
+        	// write out openal info
         	sb.append("------ OpenAL ------\n");
         	sb.append(String.format("Sound pos: %.1f; %.1f; 0\nListener pos: %.1f; %.1f; 0\nOrientation: %.1f\n\n",
         			mMarkedLocation.getLongitude()*500,mMarkedLocation.getLatitude()*500,
         			mCurrentLocation.getLongitude()*500,mCurrentLocation.getLatitude()*500,
         			mOrientation));
-            /*sb.append(String.format("Sound pos: %.1d ; %.1d\nListener pos: %.1d ; %.1d\nOrientation: %.1d",
-            		mMarkedLocation.getLongitude()*500,mMarkedLocation.getLatitude()*500,
-            		mCurrentLocation.getLongitude()*500, mCurrentLocation.getLatitude()*500,
-            		mOrientation));*/
         }
         
         sb.append("------ Compass -----\n");
