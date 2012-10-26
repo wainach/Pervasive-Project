@@ -1,0 +1,178 @@
+package dk.itu.SPCL.E2012.FriendFinder;
+
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.util.Log;
+
+public class RestClient {
+
+	// variables used in postData() method
+	private DefaultHttpClient client;
+	private HttpPost post;
+
+	private static String convertStreamToString(InputStream is) {
+		/*
+		 * To convert the InputStream to String we use the
+		 * BufferedReader.readLine() method. We iterate until the BufferedReader
+		 * return null which means there's no more data to read. Each line will
+		 * appended to a StringBuilder and returned as String.
+		 */
+		BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+		StringBuilder sb = new StringBuilder();
+
+		String line = null;
+		try {
+			while ((line = reader.readLine()) != null) {
+				sb.append(line + "\n");
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				is.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return sb.toString();
+	}
+
+	/*
+	 * This is a test function which will connects to a given rest service and
+	 * prints it's response to Android Log with labels "mapou".
+	 */
+	public static ArrayList<String[]> connect(String url) {
+
+		Log.i("mapou", "RestClient.connect()");
+
+		HttpClient httpclient = new DefaultHttpClient();
+
+		// Prepare a request object
+		HttpGet httpget = new HttpGet(url);
+
+		// Execute the request
+		HttpResponse response;
+
+		try {
+			response = httpclient.execute(httpget);
+			// Examine the response status
+			Log.i("mapou", "http get response status: "
+					+ response.getStatusLine().toString());
+
+			// Get hold of the response entity
+			HttpEntity entity = response.getEntity();
+			// If the response does not enclose an entity, there is no need
+			// to worry about connection release
+
+			if (entity != null) {
+
+				ArrayList<String[]> result = new ArrayList<String[]>();
+
+				// A Simple JSON Response Read
+				InputStream instream = entity.getContent();
+				String resultTemp = convertStreamToString(instream);
+				//resultTemp = resultTemp.substring(1, resultTemp.length() - 2);
+				Log.i("mapou", resultTemp);
+				JSONArray arrJSON = new JSONArray(resultTemp);
+				Log.i("mapou", "arrJSON length(): " + arrJSON.length());				
+
+				//for (int j = 0; j < 2; j++) {
+				for(int i=0; i < arrJSON.length(); i++) {
+					String[] position = new String[4];
+
+					JSONObject json_data = arrJSON.getJSONObject(i);
+					position[0] = json_data.getString("UUID");
+					position[1] = json_data.getString("lat");
+					position[2] = json_data.getString("long");
+					if (position[3] != null)
+						position[3] = json_data.getString("alt");
+					Log.i("mapou", "UUID: " + position[0]);
+					Log.i("mapou", "lat: " + position[1]);
+					Log.i("mapou", "lon: " + position[2]);
+					result.add(position);
+				}
+				// Closing the input stream will trigger connection release
+				instream.close();
+
+				return result;
+			}
+
+		} catch (ClientProtocolException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
+
+	public void postData(String[] values, String url) {
+
+		if (client == null)
+			client = new DefaultHttpClient();
+
+		if (post == null)
+			post = new HttpPost(url);
+
+		// POST DATA TO WEB SERVICE
+
+		Log.i("mapou", "POST INITIATED");
+		List<NameValuePair> pairs = new ArrayList<NameValuePair>();
+		pairs.add(new BasicNameValuePair("uuid", values[0]));
+		pairs.add(new BasicNameValuePair("lat", values[1]));
+		pairs.add(new BasicNameValuePair("long", values[2]));
+		pairs.add(new BasicNameValuePair("alt", values[3]));
+
+		try {
+			post.setEntity(new UrlEncodedFormEntity(pairs));
+		} catch (UnsupportedEncodingException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+		new Thread(new Runnable() {
+			public void run() {
+				try {
+					HttpResponse debug = client.execute(post);
+					Log.i("mapou", "DATA POSTED TO PYTHON ANYWHERE. HTTP response: " + debug.getStatusLine().toString());
+				} catch (ClientProtocolException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}).start();
+
+	}
+
+
+}
