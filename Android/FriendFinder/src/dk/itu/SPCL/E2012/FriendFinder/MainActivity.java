@@ -91,7 +91,7 @@ public class MainActivity extends Activity implements Observer {
 
 	
 	/*
-	 * HANDELING UI DATA
+	 * HANDLING UI DATA
 	 */
 	public void clearDisplay(View v) {
 		uiData.uiText = "";
@@ -102,7 +102,7 @@ public class MainActivity extends Activity implements Observer {
 		this.runOnUiThread(new Runnable() {
 			public void run() {
 				TextView textView = (TextView) findViewById(R.id.mainTextView);
-				textView.setText(uiData.uiText + "\n\n" + uiData.position);
+				textView.setText("Friends: \n" + uiData.uiText + "\n\n" + "Me: \n" + uiData.position + "\n" + "InducedBearing: " + inducedBearing);
 			}
 		});
 	}
@@ -111,7 +111,7 @@ public class MainActivity extends Activity implements Observer {
 	
 	
 	/*
-	 * COMMUNICATION WITH FRIENDFINDER WEBSERVICE
+	 * COMMUNICATION WITH FRIENDFINDER WEB SERVICE
 	 */
 	private void connectToFriendFinderWS(String url) {
 		AsyncConnection connection = new AsyncConnection(url, this);
@@ -121,21 +121,20 @@ public class MainActivity extends Activity implements Observer {
 	// Called every time worker thread has polled web service for a location request
 	@Override
 	public void update(Observable observable, Object data) {
-		// TODO Auto-generated method stub
-		Log.i(TAG, "update() " + data);
-		// uiData.uiText = (String) data;
-		ArrayList<String[]> locations = (ArrayList<String[]>) data;
 
-		for (String[] location : locations) {
+		for (String[] location : (ArrayList<String[]>) data) {
 			String friendUUID = location[0];
+			// continue to next id if we are looking at our own
 			if (friendUUID.equals(UUID))
 				continue;
 			Friend f;
-			if (!this.newFriend(friendUUID)) {
-				f = new Friend(friendUUID, SOUNDS[friends.size()+1]);
+			if (newFriend(friendUUID)) {
+				Log.i(TAG, "New friend: " + friendUUID);
+				f = new Friend(friendUUID, SOUNDS[friends.size()]);
 				friends.add(f);
 				try {
 					soundMap.put(f.getSound(), env.addSource(env.addBuffer(f.getSound())));
+					soundMap.get(f.getSound()).play(true);
 					Log.i(TAG, "Sound added: " + f.getSound());
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
@@ -143,19 +142,19 @@ public class MainActivity extends Activity implements Observer {
 				}
 			}
 			else {
+				Log.i(TAG, "Old friend: " + friendUUID);
 				f = getFriend(friendUUID);
-				
 			}
 			f.setLat(Float.parseFloat(location[1]));
 			f.setLon(Float.parseFloat(location[2]));
 			f.setAlt(Float.parseFloat(location[3]));
+			
 			soundMap.get(f.getSound()).setPosition(f.getLon(), f.getLat(), f.getAlt());
 			
 			StringBuilder sb = new StringBuilder();
 			sb.append(location[0] + "\n----" + location[1] + ", " + location[2] + "\n");
-		}
-		StringBuilder sb = new StringBuilder();
-		uiData.uiText = sb.toString();
+			uiData.uiText = sb.toString();
+		}		
 		updateDisplay();
 	}
 	///////////////////////////////////////////////////////////////////
@@ -196,6 +195,7 @@ public class MainActivity extends Activity implements Observer {
 				double alt = currentBestLocation.getAltitude();
 				Log.i(TAG, "A_lat: " + lat + " , A_lon: " + lon);
 				
+				// Update listener position
 				env.setListenerPos((float) lon, (float) lat, (float) alt);
 				
 				// Post position to web service
@@ -292,12 +292,15 @@ public class MainActivity extends Activity implements Observer {
 	///////////////////////////////////////////////////////////////////
 	
 	
+	/*
+	 * UTILITY FUNCTIONS
+	 */
 	private boolean newFriend(String id) {
 		for (Friend f : friends) {
 			if (id.equals(f.getId()))
-				return true;
+				return false;
 		}
-		return false;
+		return true;
 	}
 	
 	private Friend getFriend(String id) {

@@ -1,48 +1,56 @@
 package dk.itu.SPCL.E2012.FriendFinder;
 
+import android.location.Location;
+
 public class Friend {
 
 	private String id;
 	private String sound;
-	private float lat = 0;
-	private float lon = 0;
-	private float alt = 0;
+	private Location location;
 	
 	public Friend(String id, String sound) {
 		this.id = id;
 		this.sound = sound;
+		location = new Location(id + "_location");
+		location.setLatitude(0);
+		location.setLongitude(0);
+		location.setAltitude(0);
 	}
 
 	public float getLat() {
-		return lat;
+		return (float) location.getLatitude();
 	}
 
 	public void setLat(float lat) {
-		this.lat = lat;
+		this.location.setLatitude((float) lat);
 	}
 	
 	public float getLon() {
-		return lon;
+		return (float) location.getLongitude();
 	}
 
 	public void setLon(float lon) {
-		this.lon = lon;
+		this.location.setLongitude((float) lon);
 	}
 	
 	public float getAlt() {
-		return alt;
+		return (float) location.getAltitude();
 	}
 
 	public void setAlt(float alt) {
-		this.alt = alt;
+		this.location.setAltitude((float) alt);
 	}
 
 	public String getId() {
-		return id;
+		return this.id;
+	}
+	
+	public Location getLocation() {
+		return this.location;
 	}
 
 	public String getSound() {
-		return sound;
+		return this.sound;
 	}
 	
 }
