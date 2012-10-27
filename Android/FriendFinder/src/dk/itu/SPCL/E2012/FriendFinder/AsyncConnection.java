@@ -12,6 +12,7 @@ import android.util.Log;
 public class AsyncConnection extends Observable implements Runnable {
 
 	private String url;
+	private final static String	TAG	= "AsyncConnection";
 
 	public AsyncConnection(String url, Observer obs) {
 		this.url = url;
@@ -25,20 +26,9 @@ public class AsyncConnection extends Observable implements Runnable {
 
 			ArrayList<String[]> reply = RestClient.connect(url);
 			if (reply != null) {
-				/*
-					for (String[] location : reply) {
-					String UUID = location[0];
-					float lat = Float.parseFloat(location[1]);
-					float lon = Float.parseFloat(location[2]);
-				*/
-					// TODO: Update position of sound associated with UUID
-				
-			} else {
-
+				setChanged();
+				notifyObservers(reply);
 			}
-			setChanged();
-			notifyObservers(reply);
-
 			try {
 				Thread.sleep(5000);
 			} catch (InterruptedException e) {

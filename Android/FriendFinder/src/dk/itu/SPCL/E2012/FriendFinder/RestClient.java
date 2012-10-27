@@ -30,6 +30,7 @@ public class RestClient {
 	// variables used in postData() method
 	private DefaultHttpClient client;
 	private HttpPost post;
+	private final static String	TAG	= "RestClient";
 
 	private static String convertStreamToString(InputStream is) {
 		/*
@@ -60,11 +61,11 @@ public class RestClient {
 
 	/*
 	 * This is a test function which will connects to a given rest service and
-	 * prints it's response to Android Log with labels "mapou".
+	 * prints it's response to Android Log with labels TAG.
 	 */
 	public static ArrayList<String[]> connect(String url) {
 
-		Log.i("mapou", "RestClient.connect()");
+		Log.i(TAG, "RestClient.connect()");
 
 		HttpClient httpclient = new DefaultHttpClient();
 
@@ -77,7 +78,7 @@ public class RestClient {
 		try {
 			response = httpclient.execute(httpget);
 			// Examine the response status
-			Log.i("mapou", "http get response status: "
+			Log.i(TAG, "http get response status: "
 					+ response.getStatusLine().toString());
 
 			// Get hold of the response entity
@@ -93,9 +94,9 @@ public class RestClient {
 				InputStream instream = entity.getContent();
 				String resultTemp = convertStreamToString(instream);
 				//resultTemp = resultTemp.substring(1, resultTemp.length() - 2);
-				Log.i("mapou", resultTemp);
+				Log.i(TAG, resultTemp);
 				JSONArray arrJSON = new JSONArray(resultTemp);
-				Log.i("mapou", "arrJSON length(): " + arrJSON.length());				
+				Log.i(TAG, "arrJSON length(): " + arrJSON.length());				
 
 				//for (int j = 0; j < 2; j++) {
 				for(int i=0; i < arrJSON.length(); i++) {
@@ -107,9 +108,11 @@ public class RestClient {
 					position[2] = json_data.getString("long");
 					if (position[3] != null)
 						position[3] = json_data.getString("alt");
-					Log.i("mapou", "UUID: " + position[0]);
-					Log.i("mapou", "lat: " + position[1]);
-					Log.i("mapou", "lon: " + position[2]);
+					else
+						position[3] = "0";
+					Log.i(TAG, "UUID: " + position[0]);
+					Log.i(TAG, "lat: " + position[1]);
+					Log.i(TAG, "lon: " + position[2]);
 					result.add(position);
 				}
 				// Closing the input stream will trigger connection release
@@ -143,7 +146,7 @@ public class RestClient {
 
 		// POST DATA TO WEB SERVICE
 
-		Log.i("mapou", "POST INITIATED");
+		Log.i(TAG, "POST INITIATED");
 		List<NameValuePair> pairs = new ArrayList<NameValuePair>();
 		pairs.add(new BasicNameValuePair("uuid", values[0]));
 		pairs.add(new BasicNameValuePair("lat", values[1]));
@@ -161,7 +164,7 @@ public class RestClient {
 			public void run() {
 				try {
 					HttpResponse debug = client.execute(post);
-					Log.i("mapou", "DATA POSTED TO PYTHON ANYWHERE. HTTP response: " + debug.getStatusLine().toString());
+					Log.i(TAG, "DATA POSTED TO PYTHON ANYWHERE. HTTP response: " + debug.getStatusLine().toString());
 				} catch (ClientProtocolException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

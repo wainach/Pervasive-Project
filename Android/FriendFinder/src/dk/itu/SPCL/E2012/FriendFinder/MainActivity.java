@@ -1,10 +1,16 @@
 package dk.itu.SPCL.E2012.FriendFinder;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.UUID;
+
+import org.pielot.openal.Buffer;
+import org.pielot.openal.SoundEnv;
+import org.pielot.openal.Source;
 
 import android.app.Activity;
 import android.content.Context;
@@ -19,30 +25,56 @@ import android.widget.TextView;
 
 public class MainActivity extends Activity implements Observer {
 
+	private final static String	TAG	= "MainActivity";
 	private LocationManager locationManager;
 	private LocationListener locationListener;
 	private Location currentBestLocation;
 	private float inducedBearing; // Bearing calculated on location changes
 	
 	private String UUID; // Phone-specific id
-	private List<String> friends; // Friends represented by their phone's id
+	private List<Friend> friends; // Friends represented by their phone's id
+	private final String[] SOUNDS = {"submarine2", "owl", "sonar", "submarine", "lake"};
 	private UIData uiData; // Object for storing data to be presented in UI
+	
 	private class UIData {
 		public String uiText = "";
 		public String position = "";
 	}
+	
+	/**
+     * OpenAL
+     */
+	private SoundEnv env;
+	private HashMap<String, Source> soundMap;
 
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		uiData = new UIData();
 		UUID = getUUID();
-
+		friends = new ArrayList<Friend>();
+		soundMap = new HashMap<String, Source>();
 		connectToFriendFinderWS("http://martinpoulsen.pythonanywhere.com/positions/json");
 		getAndroidLocation();
+		
+		// sound
+        try {
+			/* First we obtain the instance of the sound environment. */
+			this.env = SoundEnv.getInstance(this);
+		} 
+        catch (Exception e) {
+			Log.e(TAG, "could not initialise OpenAL4Android", e);
+		}
 	}
 
+	// this.env.setListenerOrientation(20);
+	// this.lake1.setPosition(0,0,0);
+	
+	/*
+	 * GET UNIQUE ID FOR THIS DEVICE
+	 */
 	private String getUUID() {
 		final TelephonyManager tm = (TelephonyManager) getBaseContext().getSystemService(Context.TELEPHONY_SERVICE);
 
@@ -54,8 +86,10 @@ public class MainActivity extends Activity implements Observer {
 	    UUID deviceUuid = new UUID(androidId.hashCode(), ((long)tmDevice.hashCode() << 32) | tmSerial.hashCode());
 	    return deviceUuid.toString();
 	}
+	///////////////////////////////////////////////////////////////////
 	
 
+	
 	/*
 	 * HANDELING UI DATA
 	 */
@@ -88,19 +122,39 @@ public class MainActivity extends Activity implements Observer {
 	@Override
 	public void update(Observable observable, Object data) {
 		// TODO Auto-generated method stub
-		Log.i("mapou", "update() " + data);
+		Log.i(TAG, "update() " + data);
 		// uiData.uiText = (String) data;
 		ArrayList<String[]> locations = (ArrayList<String[]>) data;
-		StringBuilder sb = new StringBuilder();
 
 		for (String[] location : locations) {
-			String UUID = location[0];
-			float lat = Float.parseFloat(location[1]);
-			float lon = Float.parseFloat(location[2]);
+			String friendUUID = location[0];
+			if (friendUUID.equals(UUID))
+				continue;
+			Friend f;
+			if (!this.newFriend(friendUUID)) {
+				f = new Friend(friendUUID, SOUNDS[friends.size()+1]);
+				friends.add(f);
+				try {
+					soundMap.put(f.getSound(), env.addSource(env.addBuffer(f.getSound())));
+					Log.i(TAG, "Sound added: " + f.getSound());
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			else {
+				f = getFriend(friendUUID);
+				
+			}
+			f.setLat(Float.parseFloat(location[1]));
+			f.setLon(Float.parseFloat(location[2]));
+			f.setAlt(Float.parseFloat(location[3]));
+			soundMap.get(f.getSound()).setPosition(f.getLon(), f.getLat(), f.getAlt());
+			
+			StringBuilder sb = new StringBuilder();
 			sb.append(location[0] + "\n----" + location[1] + ", " + location[2] + "\n");
-
-			// TODO: Update position of sound associated with UUID
 		}
+		StringBuilder sb = new StringBuilder();
 		uiData.uiText = sb.toString();
 		updateDisplay();
 	}
@@ -124,23 +178,25 @@ public class MainActivity extends Activity implements Observer {
 			public void onLocationChanged(Location location) {
 				
 				if (!isBetterLocation(location, currentBestLocation)) {
-					Log.i("mapou", "new location is NOT better");
+					Log.i(TAG, "new location is NOT better");
 					return;
 				} else {
 					// induce direction by comparing the old and the new locations
 					if (currentBestLocation != null) {
 						inducedBearing = currentBestLocation.bearingTo(location);
-						Log.i("mapou", "inducedBearing: " + inducedBearing);
+						Log.i(TAG, "inducedBearing: " + inducedBearing);
 					}
 					
 					currentBestLocation = location;
-					Log.i("mapou", "new location is better");
+					Log.i(TAG, "new location is better");
 				}
 
 				double lat = currentBestLocation.getLatitude();
 				double lon = currentBestLocation.getLongitude();
 				double alt = currentBestLocation.getAltitude();
-				Log.i("mapou", "A_lat: " + lat + " , A_lon: " + lon);
+				Log.i(TAG, "A_lat: " + lat + " , A_lon: " + lon);
+				
+				env.setListenerPos((float) lon, (float) lat, (float) alt);
 				
 				// Post position to web service
 				String[] postData = new String[4];
@@ -149,7 +205,7 @@ public class MainActivity extends Activity implements Observer {
 				postData[2] = Double.toString(lon);
 				postData[3] = Double.toString(alt);
 				new RestClient().postData(postData, "http://martinpoulsen.pythonanywhere.com/positions/json/");
-				Log.i("mapou", "Location posted to WS");
+				Log.i(TAG, "Location posted to WS");
 				
 				// Present location on screen
 				uiData.position = 
@@ -234,5 +290,23 @@ public class MainActivity extends Activity implements Observer {
 		return provider1.equals(provider2);
 	}
 	///////////////////////////////////////////////////////////////////
+	
+	
+	private boolean newFriend(String id) {
+		for (Friend f : friends) {
+			if (id.equals(f.getId()))
+				return true;
+		}
+		return false;
+	}
+	
+	private Friend getFriend(String id) {
+		for (Friend f : friends) {
+			if (id.equals(f.getId()))
+				return f;
+		}
+		return null;
+	}
+	
 
 }
