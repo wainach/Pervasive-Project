@@ -33,7 +33,7 @@ public class MainActivity extends Activity implements Observer {
 	
 	private String UUID; // Phone-specific id
 	private List<Friend> friends; // Friends represented by their phone's id
-	private final String[] SOUNDS = {"submarine2", "owl", "sonar", "submarine", "lake"};
+	private final String[] SOUND_STRINGS = {"submarine2", "owl", "sonar", "submarine", "lake"};
 	private UIData uiData; // Object for storing data to be presented in UI
 	
 	private class UIData {
@@ -130,7 +130,7 @@ public class MainActivity extends Activity implements Observer {
 			Friend f;
 			if (newFriend(friendUUID)) {
 				Log.i(TAG, "New friend: " + friendUUID);
-				f = new Friend(friendUUID, SOUNDS[friends.size()]);
+				f = new Friend(friendUUID, SOUND_STRINGS[friends.size()]);
 				friends.add(f);
 				try {
 					soundMap.put(f.getSound(), env.addSource(env.addBuffer(f.getSound())));
@@ -159,6 +159,13 @@ public class MainActivity extends Activity implements Observer {
 	}
 	///////////////////////////////////////////////////////////////////
 
+	
+	
+	/*
+	 * HANDELING ORIENTATION
+	 */
+	
+	
 	
 	
 	/*
