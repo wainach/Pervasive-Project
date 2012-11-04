@@ -532,7 +532,10 @@ public class BearingActivity extends Activity {
         	
         	// bearing angle from magnetic north (interval -180 to 180)
         	bearingAngle = mCurrentLocation.bearingTo(mMarkedLocation);
-            
+        	Log.i("DIRECTION", "bearingAngle: " + Float.toString(bearingAngle));
+        	
+        	Log.i("DIRECTION", "mOrientation: " + Float.toString(mOrientation));
+        	
         	// difference from compass value (interval out 0 to 360)
             float dir = (mOrientation - bearingAngle) - bearingAngle;
             if(dir >= 360) dir = dir - 360;
