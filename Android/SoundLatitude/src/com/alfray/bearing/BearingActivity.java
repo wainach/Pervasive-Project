@@ -708,6 +708,8 @@ public class BearingActivity extends Activity {
             }
         }
 
+        
+        
         private float windowAvg(float v) {
 
             int n = mNbWindow;

@@ -49,7 +49,7 @@ public class MainActivity extends Activity implements Observer {
 	private String UUID; // Phone-specific id
 	private List<Friend> friends; // Friends represented by their phone's id
 	//private final String[] SOUND_STRINGS = {"submarine2", "owl", "sonar", "submarine", "lake"};
-	private final String[] SOUND_STRINGS = {"sonar", "submarine", "submarine2", "owl", "lake"};	
+	private final String[] SOUND_STRINGS = {"submarine2", "owl", "sonar", "submarine", "lake"};	
 	private UIData uiData; // Object for storing data to be presented in UI
 	
 	private class UIData {
@@ -167,6 +167,24 @@ public class MainActivity extends Activity implements Observer {
 	@Override
 	public void update(Observable observable, Object data) {
 		StringBuilder sb = new StringBuilder();
+		if (((ArrayList<String[]>) data).size() - 1 > this.friends.size()) {
+			
+			// stop all sounds of friends and release their buffer
+			for (String[] location : (ArrayList<String[]>) data) {
+				String friendUUID = location[0];
+				try {
+					this.soundMap.get(getFriend(friendUUID).getSound()).stop();
+					this.soundMap.get(getFriend(friendUUID).getSound()).release();
+				}
+				catch(Exception e) {
+					Log.e(TAG, "Exception catched when trying to stop a sound in update() method");
+				}
+			}
+			
+			// remove all friends - active players will be re-created below
+			friends.clear();
+		}
+			
 		for (String[] location : (ArrayList<String[]>) data) {
 			String friendUUID = location[0];
 			// continue to next id if we are looking at our own UUID
@@ -288,6 +306,17 @@ public class MainActivity extends Activity implements Observer {
       }
   }
 	
+	/*
+	 * HELPER METHODS
+	 */
+	private float normalizeDegrees(float degrees) {
+    	if (degrees > 360f)
+    		degrees = normalizeDegrees(degrees - 360f);
+    	else if (degrees < 0f)
+    		degrees = normalizeDegrees(degrees + 360f);
+    	return degrees;
+    }
+	
 	private void updateOrientation() {
 		// listener orientation is the compass orientation
     	this.env.setListenerOrientation(mOrientation);
@@ -299,6 +328,9 @@ public class MainActivity extends Activity implements Observer {
     	
     	this.updateDisplay();
 	}
+	
+	
+	
 	
 	/*
 	 * HANDLING LOCATION
@@ -448,18 +480,13 @@ public class MainActivity extends Activity implements Observer {
         	// Log.i("FRIEND POSITION", "long: " + (float) soundLocation.getLongitude() * this.gpsToMetricFactor + " | lat: " + (float) soundLocation.getLatitude() * this.gpsToMetricFactor);
 
         	// bearing angle from magnetic north (interval -180 to 180)
-        	bearingAngle = this.currentBestLocation.bearingTo(soundLocation);
+        	bearingAngle = normalizeDegrees(this.currentBestLocation.bearingTo(soundLocation));
         	Log.i("DIRECTION", "bearingAngle: " + Float.toString(bearingAngle));
         	
         	Log.i("DIRECTION", "mOrientation: " + Float.toString(mOrientation));
         	
         	// difference from compass value (interval out 0 to 360)
-            float dir = mOrientation - bearingAngle;
-            if (dir >= 360)
-            	dir -= 360;
-            else if (dir < 0)
-            	dir += 360;
-            
+            float dir = normalizeDegrees(mOrientation - bearingAngle);
             Log.i("DIRECTION", "dir: " + Float.toString(dir));
             
             // check for back or front and adjust gain (vol)
