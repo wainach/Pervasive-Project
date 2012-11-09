@@ -49,7 +49,7 @@ public class MainActivity extends Activity implements Observer {
 	private String UUID; // Phone-specific id
 	private List<Friend> friends; // Friends represented by their phone's id
 	//private final String[] SOUND_STRINGS = {"submarine2", "owl", "sonar", "submarine", "lake"};
-	private final String[] SOUND_STRINGS = {"submarine2", "owl", "sonar", "submarine", "lake"};	
+	private final String[] SOUND_STRINGS = {"monster-growl", "galloping-horse", "duck", "submarine2", "owl", "sonar", "submarine", "lake"};	
 	private UIData uiData; // Object for storing data to be presented in UI
 	
 	private class UIData {
