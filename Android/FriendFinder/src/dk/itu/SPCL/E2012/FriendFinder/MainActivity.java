@@ -34,7 +34,7 @@ public class MainActivity extends Activity implements Observer {
 	private LocationListener locationListener;
 	private Location currentBestLocation;
 	private float inducedDirection; // Bearing calculated on location changes
-	private float gpsToMetricFactor = 500f;
+	private float gpsToMetricFactor = 1000f;
 
 	private SensorManager mSensorMan;
 	private Sensor mOrientSensor;
