@@ -57,6 +57,11 @@ public class MainActivity extends Activity implements Observer {
 		public String position = "";
 	}
 	
+	// latest friend locations
+	ArrayList<String[]> latestFriendLocations = new ArrayList<String[]>();
+	// game radius (meters)
+	final int GAME_RADIUS = 1000;
+	
 	/**
      * OpenAL
      */
@@ -166,6 +171,7 @@ public class MainActivity extends Activity implements Observer {
 	// Called every time worker thread has polled web service for a location request
 	@Override
 	public void update(Observable observable, Object data) {
+		latestFriendLocations = (ArrayList<String[]>) data;
 		StringBuilder sb = new StringBuilder();
 		if (((ArrayList<String[]>) data).size() - 1 > this.friends.size()) {
 			
@@ -216,9 +222,13 @@ public class MainActivity extends Activity implements Observer {
 			this.updateSoundOrientation(f.getLocation(), this.soundMap.get(f.getSound()));
 			
 			sb.append(location[0] + "\n----" + location[1] + ", " + location[2] + "\n");
+			
 		}	
 		uiData.uiText = sb.toString();
 		updateDisplay();
+		
+		// check distance
+		checkDistance();
 	}
 	///////////////////////////////////////////////////////////////////
 
@@ -386,6 +396,9 @@ public class MainActivity extends Activity implements Observer {
 						"lat: "	+ currentBestLocation.getLatitude() + 
 						", lon: " + currentBestLocation.getLongitude();
 				updateDisplay();
+				
+				// distance check
+				checkDistance();
 			}
 
 			public void onStatusChanged(String provider, int status, Bundle extras) {
@@ -519,6 +532,44 @@ public class MainActivity extends Activity implements Observer {
         }
 
     }
+	
+	/*
+	 * HANDLING DISTANCE
+	 */
+	private void checkDistance() {
+
+		for (String[] location : latestFriendLocations) {
+			// check distance for every lcoation
+			Location l = new Location("Friend");
+			l.setLatitude(Double.parseDouble(location[1]));
+			l.setLongitude(Double.parseDouble(location[2]));
+			l.setAltitude(Double.parseDouble(location[3]));
+
+			double distBetween = currentBestLocation.distanceTo(l);
+			
+			Log.i("TESTING DISTANCE",
+					Double.toString(currentBestLocation.distanceTo(l)));
+			
+			// ranges
+			if(distBetween < (5/5)*GAME_RADIUS) {
+				
+			}
+			else if(distBetween < (4/5)*GAME_RADIUS) {
+				
+			}
+			else if(distBetween < (3/5)*GAME_RADIUS) {
+							
+			}
+			else if(distBetween < (2/5)*GAME_RADIUS) {
+				
+			}
+			else if(distBetween < (1/5)*GAME_RADIUS) {
+				
+			}
+		}
+	}
+	
+	
 	///////////////////////////////////////////////////////////////////
 	
 	
@@ -540,6 +591,5 @@ public class MainActivity extends Activity implements Observer {
 		}
 		return null;
 	}
-	
 
 }
