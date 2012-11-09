@@ -50,8 +50,8 @@ public class MainActivity extends Activity implements Observer {
 	private List<Friend> friends; // Friends represented by their phone's id
 	// private final String[] SOUND_STRINGS = {"submarine2", "owl", "sonar",
 	// "submarine", "lake"};
-	private final String[] SOUND_STRINGS = { "submarine2",
-			"lake", "galloping_horse", "monster_growl", "owl", "sonar",
+	private final String[] SOUND_STRINGS = { "submarine2", "monster_growl", "lake",
+			"galloping_horse", "owl", "sonar",
 			"submarine", "duck" };
 	private UIData uiData; // Object for storing data to be presented in UI
 
