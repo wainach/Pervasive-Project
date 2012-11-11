@@ -12,10 +12,12 @@ import android.util.Log;
 public class AsyncConnection extends Observable implements Runnable {
 
 	private String url;
+	private String UUID;
 	private final static String	TAG	= "AsyncConnection";
 
-	public AsyncConnection(String url, Observer obs) {
+	public AsyncConnection(String url, String UUID, Observer obs) {
 		this.url = url;
+		this.UUID = UUID;
 		this.addObserver(obs);
 	}
 
@@ -24,7 +26,7 @@ public class AsyncConnection extends Observable implements Runnable {
 
 		while (true) {
 
-			ArrayList<String[]> reply = RestClient.connect(url);
+			ArrayList<String[]> reply = RestClient.connect(url); //url + "?uuid=" + UUID);
 			if (reply != null) {
 				setChanged();
 				notifyObservers(reply);

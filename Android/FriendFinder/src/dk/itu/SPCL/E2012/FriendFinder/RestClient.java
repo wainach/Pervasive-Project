@@ -28,8 +28,8 @@ import android.util.Log;
 public class RestClient {
 
 	// variables used in postData() method
-	private DefaultHttpClient client;
-	private HttpPost post;
+	private static DefaultHttpClient client;
+	private static HttpPost post;
 	private final static String	TAG	= "RestClient";
 
 	private static String convertStreamToString(InputStream is) {
@@ -136,7 +136,7 @@ public class RestClient {
 	}
 
 
-	public void postData(String[] values, String url) {
+	public static void postData(String[] values, String url) {
 
 		if (client == null)
 			client = new DefaultHttpClient();

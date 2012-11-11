@@ -34,7 +34,9 @@ public class MainActivity extends Activity implements Observer {
 	private LocationListener locationListener;
 	private Location currentBestLocation;
 	private float inducedDirection; // Bearing calculated on location changes
-	private float gpsToMetricFactor = 1000f;
+	private float altToMetricFactor = 1000f; // ???
+	private float latToMetricFactor = 1113.5f; // 1 : 100m
+	private float lonToMetricFactor = 629.5f; // 1 : 100m
 
 	private SensorManager mSensorMan;
 	private Sensor mOrientSensor;
@@ -50,9 +52,9 @@ public class MainActivity extends Activity implements Observer {
 	private List<Friend> friends; // Friends represented by their phone's id
 	// private final String[] SOUND_STRINGS = {"submarine2", "owl", "sonar",
 	// "submarine", "lake"};
-	private final String[] SOUND_STRINGS = { "submarine2", "monster_growl", "lake",
-			"galloping_horse", "owl", "sonar",
-			"submarine", "duck" };
+	private final String[] SOUND_STRINGS = { "owl", "monster-growl",
+			"submarine2", "lake", "galloping_horse", "sonar", "submarine",
+			"duck" };
 	private UIData uiData; // Object for storing data to be presented in UI
 
 	private class UIData {
@@ -79,7 +81,7 @@ public class MainActivity extends Activity implements Observer {
 		UUID = getUUID();
 		friends = new ArrayList<Friend>();
 		soundMap = new HashMap<String, Source>();
-		connectToFriendFinderWS("http://martinpoulsen.pythonanywhere.com/positions/json");
+		connectToFriendFinderWS("http://martinpoulsen.pythonanywhere.com/positions/json/get_locations", UUID);
 		getAndroidLocation();
 
 		// orientation
@@ -175,8 +177,8 @@ public class MainActivity extends Activity implements Observer {
 	/*
 	 * COMMUNICATION WITH FRIENDFINDER WEB SERVICE
 	 */
-	private void connectToFriendFinderWS(String url) {
-		AsyncConnection connection = new AsyncConnection(url, this);
+	private void connectToFriendFinderWS(String url, String UUID) {
+		AsyncConnection connection = new AsyncConnection(url, UUID, this);
 		new Thread(connection).start();
 	}
 
@@ -234,13 +236,12 @@ public class MainActivity extends Activity implements Observer {
 
 			// soundMap.get(f.getSound()).setPosition(f.getLon(), f.getLat(),
 			// f.getAlt());
-			this.updateSoundOrientation(f.getLocation(),
-					this.soundMap.get(f.getSound()));
 
 			sb.append(location[0] + "\n----" + location[1] + ", " + location[2]
 					+ "\n");
 
 		}
+		this.updateSoundOrientation();
 		uiData.uiText = sb.toString();
 		updateDisplay();
 
@@ -286,7 +287,7 @@ public class MainActivity extends Activity implements Observer {
 				mOrientation2 = windowAvg(event.values[0]);
 
 				updateOrientation();
-				// updateSoundOrientation();
+				updateSoundOrientation();
 			}
 		}
 
@@ -348,10 +349,7 @@ public class MainActivity extends Activity implements Observer {
 		this.env.setListenerOrientation(mOrientation);
 		// Log.i("ORIENTATION", Float.toString(mOrientation));
 
-		for (Friend f : friends) {
-			this.updateSoundOrientation(f.getLocation(),
-					this.soundMap.get(f.getSound()));
-		}
+		this.updateSoundOrientation();
 
 		this.updateDisplay();
 	}
@@ -379,8 +377,7 @@ public class MainActivity extends Activity implements Observer {
 					// induce direction by comparing the old and the new
 					// locations
 					if (currentBestLocation != null) {
-						inducedDirection = currentBestLocation
-								.bearingTo(location);
+						inducedDirection = currentBestLocation.bearingTo(location);
 						Log.i(TAG, "inducedBearing: " + inducedDirection);
 					}
 
@@ -394,8 +391,8 @@ public class MainActivity extends Activity implements Observer {
 				Log.i(TAG, "A_lat: " + lat + " , A_lon: " + lon);
 
 				// Update listener position
-				env.setListenerPos((float) lon * gpsToMetricFactor, (float) lat
-						* gpsToMetricFactor, (float) alt * gpsToMetricFactor);
+				env.setListenerPos((float) lon * lonToMetricFactor, (float) lat
+						* latToMetricFactor, (float) alt * altToMetricFactor);
 				// this.env.setListenerPos((float)this.currentBestLocation.getLongitude()*500,
 				// (float)this.currentBestLocation.getLatitude()*500, 0);
 
@@ -405,9 +402,7 @@ public class MainActivity extends Activity implements Observer {
 				postData[1] = Double.toString(lat);
 				postData[2] = Double.toString(lon);
 				postData[3] = Double.toString(alt);
-				new RestClient()
-						.postData(postData,
-								"http://martinpoulsen.pythonanywhere.com/positions/json/");
+				RestClient.postData(postData, "http://martinpoulsen.pythonanywhere.com/positions/json/post_location/");
 				Log.i(TAG, "Location posted to WS");
 
 				// Present location on screen
@@ -466,8 +461,7 @@ public class MainActivity extends Activity implements Observer {
 		}
 
 		// Check whether the new location fix is more or less accurate
-		int accuracyDelta = (int) (location.getAccuracy() - currentlyBestLocation
-				.getAccuracy());
+		int accuracyDelta = (int) (location.getAccuracy() - currentlyBestLocation.getAccuracy());
 		boolean isLessAccurate = accuracyDelta > 0;
 		boolean isMoreAccurate = accuracyDelta < 0;
 		boolean isSignificantlyLessAccurate = accuracyDelta > 200;
@@ -502,60 +496,67 @@ public class MainActivity extends Activity implements Observer {
 	/*
 	 * HANDLING ORIENTATION
 	 */
-	public void updateSoundOrientation(Location soundLocation, Source sound) {
+	public void updateSoundOrientation() {
 
-		// new bearing value
-		float bearingAngle = 0;
+		for (Friend f : friends) {
+			Source sound = this.soundMap.get(f.getSound());
+			Location soundLocation = f.getLocation();
 
-		if (this.currentBestLocation != null && soundLocation != null
-				&& sound != null) {
+			// new bearing value
+			float bearingAngle = 0;
 
-			sound.setPosition((float) soundLocation.getLongitude()
-					* this.gpsToMetricFactor,
-					(float) soundLocation.getLatitude()
-							* this.gpsToMetricFactor, 0);
-			// Log.i("FRIEND POSITION", "long: " + (float)
-			// soundLocation.getLongitude() * this.gpsToMetricFactor +
-			// " | lat: " + (float) soundLocation.getLatitude() *
-			// this.gpsToMetricFactor);
+			if (this.currentBestLocation != null && soundLocation != null
+					&& sound != null) {
 
-			// bearing angle from magnetic north (interval -180 to 180)
-			bearingAngle = normalizeDegrees(this.currentBestLocation
-					.bearingTo(soundLocation));
-			Log.i("DIRECTION", "bearingAngle: " + Float.toString(bearingAngle));
+				sound.setPosition((float) soundLocation.getLongitude()
+						* this.lonToMetricFactor,
+						(float) soundLocation.getLatitude()
+								* this.latToMetricFactor, 0);
+				// Log.i("FRIEND POSITION", "long: " + (float)
+				// soundLocation.getLongitude() * this.gpsToMetricFactor +
+				// " | lat: " + (float) soundLocation.getLatitude() *
+				// this.gpsToMetricFactor);
 
-			Log.i("DIRECTION", "mOrientation: " + Float.toString(mOrientation));
+				// bearing angle from magnetic north (interval -180 to 180)
+				bearingAngle = normalizeDegrees(this.currentBestLocation
+						.bearingTo(soundLocation));
+				Log.i("DIRECTION",
+						"bearingAngle: " + Float.toString(bearingAngle));
 
-			// difference from compass value (interval out 0 to 360)
-			float dir = normalizeDegrees(mOrientation - bearingAngle);
-			Log.i("DIRECTION", "dir: " + Float.toString(dir));
+				Log.i("DIRECTION",
+						"mOrientation: " + Float.toString(mOrientation));
 
-			// check for back or front and adjust gain (vol)
-			float max = 1;
-			float min = 0.2f;
-			float dirStart = 30;
-			float dirEnd = 350;
-			// example formula
-			// factor R = (20 - 10) / (6 - 2)
-			// gain y = (x - 2) * R + 10
-			// right side
-			if (dir > dirStart && dir < 180) {
-				float R = (min - max) / (180 - dirStart);
-				float gain = (dir - dirStart) * R + max;
-				Log.i("GAIN", "Right: " + Float.toString(gain));
-				sound.setGain(gain);
-			}
-			// left side
-			else if (dir > 180 && dir < dirEnd) {
-				float R = (min - max) / (180 - dirEnd);
-				float gain = (dir - dirEnd) * R + max;
-				Log.i("GAIN", "Left: " + Float.toString(gain));
-				sound.setGain(gain);
-			}
-			// we are on our way
-			else {
-				sound.setGain(1);
-				Log.i("GAIN", "Center: 1");
+				// difference from compass value (interval out 0 to 360)
+				float dir = normalizeDegrees(mOrientation - bearingAngle);
+				Log.i("DIRECTION", "dir: " + Float.toString(dir));
+
+				// check for back or front and adjust gain (vol)
+				float max = 1;
+				float min = 0.2f;
+				float dirStart = 30;
+				float dirEnd = 350;
+				// example formula
+				// factor R = (20 - 10) / (6 - 2)
+				// gain y = (x - 2) * R + 10
+				// right side
+				if (dir > dirStart && dir < 180) {
+					float R = (min - max) / (180 - dirStart);
+					float gain = (dir - dirStart) * R + max;
+					Log.i("GAIN", "Right: " + Float.toString(gain));
+					sound.setGain(gain);
+				}
+				// left side
+				else if (dir > 180 && dir < dirEnd) {
+					float R = (min - max) / (180 - dirEnd);
+					float gain = (dir - dirEnd) * R + max;
+					Log.i("GAIN", "Left: " + Float.toString(gain));
+					sound.setGain(gain);
+				}
+				// we are on our way
+				else {
+					sound.setGain(1);
+					Log.i("GAIN", "Center: 1");
+				}
 			}
 		}
 	}
@@ -566,31 +567,42 @@ public class MainActivity extends Activity implements Observer {
 	private void checkDistance() {
 
 		if (currentBestLocation != null) {
-			for (String[] location : latestFriendLocations) {
-				// check distance for every lcoation
-				Location l = new Location("Friend");
-				l.setLatitude(Double.parseDouble(location[1]));
-				l.setLongitude(Double.parseDouble(location[2]));
-				l.setAltitude(Double.parseDouble(location[3]));
-
-				double distBetween = currentBestLocation.distanceTo(l);
+			/*
+			 * for (String[] location : latestFriendLocations) { // check
+			 * distance for every lcoation Location l = new Location("Friend");
+			 * l.setLatitude(Double.parseDouble(location[1]));
+			 * l.setLongitude(Double.parseDouble(location[2]));
+			 * l.setAltitude(Double.parseDouble(location[3]));
+			 * 
+			 * double distBetween = currentBestLocation.distanceTo(l);
+			 * 
+			 * Log.i("TESTING DISTANCE",
+			 * Double.toString(currentBestLocation.distanceTo(l)));
+			 * 
+			 * // ranges if (distBetween < (5 / 5) * GAME_RADIUS) {
+			 * 
+			 * } else if (distBetween < (4 / 5) * GAME_RADIUS) {
+			 * 
+			 * } else if (distBetween < (3 / 5) * GAME_RADIUS) {
+			 * 
+			 * } else if (distBetween < (2 / 5) * GAME_RADIUS) {
+			 * 
+			 * } else if (distBetween < (1 / 5) * GAME_RADIUS) {
+			 * 
+			 * } }
+			 */
+			for (Friend f : friends) {
+				double distBetween = currentBestLocation.distanceTo(f
+						.getLocation());
 
 				Log.i("TESTING DISTANCE",
-						Double.toString(currentBestLocation.distanceTo(l)));
-
-				// ranges
-				if (distBetween < (5 / 5) * GAME_RADIUS) {
-
-				} else if (distBetween < (4 / 5) * GAME_RADIUS) {
-
-				} else if (distBetween < (3 / 5) * GAME_RADIUS) {
-
-				} else if (distBetween < (2 / 5) * GAME_RADIUS) {
-
-				} else if (distBetween < (1 / 5) * GAME_RADIUS) {
-
-				}
+						"Distance to "
+								+ f.getId()
+								+ ": "
+								+ Double.toString(currentBestLocation
+										.distanceTo(f.getLocation())));
 			}
+
 		}
 	}
 
