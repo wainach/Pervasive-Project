@@ -567,21 +567,12 @@ public class MainActivity extends Activity implements Observer {
 	private void checkDistance() {
 
 		if (currentBestLocation != null) {
-			
-			 for (String[] location : latestFriendLocations) { // check distance for every location 
-		     Location l = new Location("Friend");
-			 l.setLatitude(Double.parseDouble(location[1]));
-			 l.setLongitude(Double.parseDouble(location[2]));
-			 l.setAltitude(Double.parseDouble(location[3]));
-			 
-			 double distBetween = currentBestLocation.distanceTo(l);
-			  
-			 // Log distance
-			 Log.i("TESTING DISTANCE", Double.toString(currentBestLocation.distanceTo(l)));
         
 			 // Iterate
 			 for (Friend f : friends) {
 				
+				double distBetween = currentBestLocation.distanceTo(f.getLocation());
+				 
 				// Get sound information
 				Source sound = this.soundMap.get(f.getSound());
 								
@@ -618,7 +609,6 @@ public class MainActivity extends Activity implements Observer {
 				// Log distance
 				Log.i("TESTING DISTANCE", "Distance to " + f.getId() + ": "	+ Double.toString(currentBestLocation.distanceTo(f.getLocation())));
 			 
-			 }
 			 }
 		}
 	}
