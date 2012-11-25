@@ -573,11 +573,31 @@ public class MainActivity extends Activity implements Observer {
 			 // Iterate
 			 for (Friend f : friends) {
 				
-				double distBetween = currentBestLocation.distanceTo(f.getLocation());
+				float distBetween = currentBestLocation.distanceTo(f.getLocation());
 				 
 				// Get sound information
 				Source sound = this.soundMap.get(f.getSound());
-								
+				
+				// continuous pitch
+			
+				float pitchMax = 2.0f;
+				float pitchMin = 1.0f;
+				float distMax = 3000;
+				float distMin = 10;
+				
+				if (distBetween > distMin && distBetween < distMax) {
+					
+					float OldRange = (distMax - distMin);
+					float NewRange = (pitchMax - pitchMin);
+					float pitch = (((distBetween - distMin) * NewRange) / OldRange) + pitchMin;
+					
+					Log.i("PITCH", "Adjust to: " + Float.toString(pitch));
+					sound.setPitch(pitch);
+				} else { Log.i("PITCH", "Distance is out of scope"); }
+				
+				/*
+				pitch with levels
+				
 				// Check distance levels and set pitch appropriately
 				if (distBetween < (5 / 10) * distFactor) {
 					
@@ -612,7 +632,9 @@ public class MainActivity extends Activity implements Observer {
 						Log.i("PITCH CHANGE", "Pitch: 1.2");
 					 }
 				} 
-
+				*/
+				
+				
 				// Log distance
 				Log.i("TESTING DISTANCE", "Distance to " + f.getId() + ": "	+ Double.toString(currentBestLocation.distanceTo(f.getLocation())));
 			 
