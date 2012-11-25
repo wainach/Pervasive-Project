@@ -587,22 +587,27 @@ public class MainActivity extends Activity implements Observer {
 								
 								if (distBetween < (1 / 10) * distFactor) {
 									 
-										sound.setPitch(2.0f); 
+										sound.setPitch(2.0f);
+										Log.i("PITCH CHANGE", "Pitch: 2.0");
 								 
 								 } else {
-									sound.setPitch(1.8f); 
+									sound.setPitch(1.8f);
+									Log.i("PITCH CHANGE", "Pitch: 1.8");
 								 }
 							 
 							 } else {
 								 sound.setPitch(1.6f);
+								 Log.i("PITCH CHANGE", "Pitch: 1.6");
 							 }
 							 
 						 } else {
 							 sound.setPitch(1.4f);
+							 Log.i("PITCH CHANGE", "Pitch: 1.4");
 						 }
 					 
 					 } else {
 						sound.setPitch(1.2f);
+						Log.i("PITCH CHANGE", "Pitch: 1.2");
 					 }
 				} 
 
