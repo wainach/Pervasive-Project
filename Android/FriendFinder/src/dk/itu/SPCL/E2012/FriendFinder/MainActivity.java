@@ -585,7 +585,19 @@ public class MainActivity extends Activity implements Observer {
 				float distMax = 3000;
 				float distMin = 10;
 				
-				if (distBetween > distMin && distBetween < distMax) {
+				if (distBetween < distMin) {
+						
+					Log.i("PITCH", "Adjust to: " + Float.toString(pitchMax));
+					sound.setPitch(pitchMax);
+					
+				} else if (distBetween > distMax) {
+					
+					Log.i("PITCH", "Adjust to: " + Float.toString(pitchMin));
+					sound.setPitch(pitchMin);
+					
+				} else {
+					
+					// Need to test this calculation properly
 					
 					float OldRange = (distMax - distMin);
 					float NewRange = (pitchMax - pitchMin);
@@ -593,7 +605,8 @@ public class MainActivity extends Activity implements Observer {
 					
 					Log.i("PITCH", "Adjust to: " + Float.toString(pitch));
 					sound.setPitch(pitch);
-				} else { Log.i("PITCH", "Distance is out of scope"); }
+					
+				}
 				
 				/*
 				pitch with levels
