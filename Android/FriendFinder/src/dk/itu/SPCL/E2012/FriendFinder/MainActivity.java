@@ -391,8 +391,10 @@ public class MainActivity extends Activity implements Observer {
 				Log.i(TAG, "A_lat: " + lat + " , A_lon: " + lon);
 
 				// Update listener position
+				/*env.setListenerPos((float) lon * lonToMetricFactor, (float) lat
+						* latToMetricFactor, (float) alt * altToMetricFactor);*/
 				env.setListenerPos((float) lon * lonToMetricFactor, (float) lat
-						* latToMetricFactor, (float) alt * altToMetricFactor);
+				* latToMetricFactor, 0);
 				// this.env.setListenerPos((float)this.currentBestLocation.getLongitude()*500,
 				// (float)this.currentBestLocation.getLatitude()*500, 0);
 
