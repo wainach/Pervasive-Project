@@ -37,7 +37,8 @@ public class MainActivity extends Activity implements Observer {
 	private float altToMetricFactor = 1000f; // ???
 	private float latToMetricFactor = 1113.5f; // 1 : 100m
 	private float lonToMetricFactor = 629.5f; // 1 : 100m
-
+	final int distFactor = 1000; // Distance factor
+	
 	private SensorManager mSensorMan;
 	private Sensor mOrientSensor;
 	private Sensor mAccelSensor;
@@ -64,8 +65,7 @@ public class MainActivity extends Activity implements Observer {
 
 	// latest friend locations
 	ArrayList<String[]> latestFriendLocations = new ArrayList<String[]>();
-	// game radius (meters)
-	final int GAME_RADIUS = 1000;
+
 
 	/**
 	 * OpenAL
@@ -567,42 +567,59 @@ public class MainActivity extends Activity implements Observer {
 	private void checkDistance() {
 
 		if (currentBestLocation != null) {
-			/*
-			 * for (String[] location : latestFriendLocations) { // check
-			 * distance for every lcoation Location l = new Location("Friend");
-			 * l.setLatitude(Double.parseDouble(location[1]));
-			 * l.setLongitude(Double.parseDouble(location[2]));
-			 * l.setAltitude(Double.parseDouble(location[3]));
-			 * 
-			 * double distBetween = currentBestLocation.distanceTo(l);
-			 * 
-			 * Log.i("TESTING DISTANCE",
-			 * Double.toString(currentBestLocation.distanceTo(l)));
-			 * 
-			 * // ranges if (distBetween < (5 / 5) * GAME_RADIUS) {
-			 * 
-			 * } else if (distBetween < (4 / 5) * GAME_RADIUS) {
-			 * 
-			 * } else if (distBetween < (3 / 5) * GAME_RADIUS) {
-			 * 
-			 * } else if (distBetween < (2 / 5) * GAME_RADIUS) {
-			 * 
-			 * } else if (distBetween < (1 / 5) * GAME_RADIUS) {
-			 * 
-			 * } }
-			 */
-			for (Friend f : friends) {
-				double distBetween = currentBestLocation.distanceTo(f
-						.getLocation());
+			
+			 for (String[] location : latestFriendLocations) { // check distance for every location 
+		     Location l = new Location("Friend");
+			 l.setLatitude(Double.parseDouble(location[1]));
+			 l.setLongitude(Double.parseDouble(location[2]));
+			 l.setAltitude(Double.parseDouble(location[3]));
+			 
+			 double distBetween = currentBestLocation.distanceTo(l);
+			  
+			 // Log distance
+			 Log.i("TESTING DISTANCE", Double.toString(currentBestLocation.distanceTo(l)));
+        
+			 // Iterate
+			 for (Friend f : friends) {
+				
+				// Get sound information
+				Source sound = this.soundMap.get(f.getSound());
+								
+				// Check distance levels and set pitch appropriately
+				if (distBetween < (5 / 10) * distFactor) {
+					
+					if (distBetween < (4 / 10) * distFactor) {
+					
+						if (distBetween < (3 / 10) * distFactor) {
+							
+							if (distBetween < (2 / 10) * distFactor) {
+								
+								if (distBetween < (1 / 10) * distFactor) {
+									 
+										sound.setPitch(2.0f); 
+								 
+								 } else {
+									sound.setPitch(1.8f); 
+								 }
+							 
+							 } else {
+								 sound.setPitch(1.6f);
+							 }
+							 
+						 } else {
+							 sound.setPitch(1.4f);
+						 }
+					 
+					 } else {
+						sound.setPitch(1.2f);
+					 }
+				} 
 
-				Log.i("TESTING DISTANCE",
-						"Distance to "
-								+ f.getId()
-								+ ": "
-								+ Double.toString(currentBestLocation
-										.distanceTo(f.getLocation())));
-			}
-
+				// Log distance
+				Log.i("TESTING DISTANCE", "Distance to " + f.getId() + ": "	+ Double.toString(currentBestLocation.distanceTo(f.getLocation())));
+			 
+			 }
+			 }
 		}
 	}
 
