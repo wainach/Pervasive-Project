@@ -603,8 +603,11 @@ public class MainActivity extends Activity implements Observer {
 					float NewRange = (pitchMax - pitchMin);
 					float pitch = (((distBetween - distMin) * NewRange) / OldRange) + pitchMin;
 					
-					Log.i("PITCH", "Adjust to: " + Float.toString(pitch));
-					sound.setPitch(pitch);
+					// Turn result around to fit pitch increase
+					float calculatedPitch = (pitchMax - pitch) + pitchMin;
+					
+					Log.i("PITCH", "Adjust to: " + Float.toString(calculatedPitch));
+					sound.setPitch(calculatedPitch);
 					
 				}
 				
