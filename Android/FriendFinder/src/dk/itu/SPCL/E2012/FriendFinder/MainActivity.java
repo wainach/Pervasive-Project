@@ -38,7 +38,7 @@ public class MainActivity extends Activity implements Observer {
 	private float latToMetricFactor = 1113.5f; // 1 : 100m
 	private float lonToMetricFactor = 629.5f; // 1 : 100m
 	final int distFactor = 1000; // Distance factor
-	
+
 	private SensorManager mSensorMan;
 	private Sensor mOrientSensor;
 	private Sensor mAccelSensor;
@@ -53,11 +53,12 @@ public class MainActivity extends Activity implements Observer {
 	private List<Friend> friends; // Friends represented by their phone's id
 	// private final String[] SOUND_STRINGS = {"submarine2", "owl", "sonar",
 	// "submarine", "lake"};
-	private final String[] SOUND_STRINGS = { "owl", "monster-growl",
+	private final String[] SOUND_STRINGS = { "church-bells", "rhythm-king", "owl", "monster-growl",
 			"submarine2", "lake", "galloping_horse", "sonar", "submarine",
 			"duck" };
 	private UIData uiData; // Object for storing data to be presented in UI
 
+	
 	private class UIData {
 		public String uiText = "";
 		public String position = "";
@@ -116,6 +117,8 @@ public class MainActivity extends Activity implements Observer {
 							SensorManager.SENSOR_DELAY_NORMAL);
 				}
 			}
+			
+			Calculator.calculateBearing(null);
 		}
 
 		// sound
@@ -589,7 +592,7 @@ public class MainActivity extends Activity implements Observer {
 			
 				float pitchMax = 2.0f;
 				float pitchMin = 1.0f;
-				float distMax = 3000;
+				float distMax = 1000;
 				float distMin = 10;
 				
 				if (distBetween < distMin) {
