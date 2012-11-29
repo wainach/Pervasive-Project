@@ -393,8 +393,20 @@ public class MainActivity extends Activity implements Observer {
 				// Update listener position
 				/*env.setListenerPos((float) lon * lonToMetricFactor, (float) lat
 						* latToMetricFactor, (float) alt * altToMetricFactor);*/
-				env.setListenerPos((float) lon * lonToMetricFactor, (float) lat
+				
+				
+				//env.setListenerPos((float) lon * lonToMetricFactor, (float) lat
+				//* latToMetricFactor, 0);
+				
+				
+				// For controlled test ITU position hardcoded
+				double latitudeITU = 55.659698162244496;
+				double longitudeITU = 12.59107232093811;
+				
+				env.setListenerPos((float) longitudeITU * lonToMetricFactor, (float) latitudeITU
 				* latToMetricFactor, 0);
+				
+				
 				// this.env.setListenerPos((float)this.currentBestLocation.getLongitude()*500,
 				// (float)this.currentBestLocation.getLatitude()*500, 0);
 
