@@ -390,25 +390,20 @@ public class MainActivity extends Activity implements Observer {
 				double alt = currentBestLocation.getAltitude();
 				Log.i(TAG, "A_lat: " + lat + " , A_lon: " + lon);
 
-				// Update listener position
+				// Update listener position WITH ALTITUDE!
 				/*env.setListenerPos((float) lon * lonToMetricFactor, (float) lat
 						* latToMetricFactor, (float) alt * altToMetricFactor);*/
 				
 				
-				//env.setListenerPos((float) lon * lonToMetricFactor, (float) lat
-				//* latToMetricFactor, 0);
-				
-				
-				// For controlled test ITU position hardcoded
-				double latitudeITU = 55.659698162244496;
-				double longitudeITU = 12.59107232093811;
-				
-				env.setListenerPos((float) longitudeITU * lonToMetricFactor, (float) latitudeITU
+				env.setListenerPos((float) lon * lonToMetricFactor, (float) lat
 				* latToMetricFactor, 0);
 				
 				
-				// this.env.setListenerPos((float)this.currentBestLocation.getLongitude()*500,
-				// (float)this.currentBestLocation.getLatitude()*500, 0);
+				// For controlled test ITU position hardcoded
+				/*double latitudeITU = 55.659698162244496;
+				double longitudeITU = 12.59107232093811;
+				env.setListenerPos((float) longitudeITU * lonToMetricFactor, (float) latitudeITU
+				* latToMetricFactor, 0);*/
 
 				// Post position to web service
 				String[] postData = new String[4];
@@ -547,8 +542,8 @@ public class MainActivity extends Activity implements Observer {
 				// check for back or front and adjust gain (vol)
 				float max = 1;
 				float min = 0.2f;
-				float dirStart = 30;
-				float dirEnd = 350;
+				float dirStart = 15;
+				float dirEnd = 345;
 				// example formula
 				// factor R = (20 - 10) / (6 - 2)
 				// gain y = (x - 2) * R + 10
