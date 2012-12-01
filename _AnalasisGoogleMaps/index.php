@@ -16,7 +16,7 @@ $(document).ready(function() {
 var json = <?php echo $message; ?>;
 
 // Make new array for GMAPS
-gmapscoordinates = new Array (10000);
+gmapscoordinates = new Array;
 var map;
 var map2;
 
@@ -27,27 +27,25 @@ for(var i = 0; i < json.length; i++)
     {
     	
     	// Populate new array for GMAPS
-    	gmapscoordinates [i] = new Array (10000);
+    	gmapscoordinates [i] = new Array;
     	
     	// Iterate positions
         for(var j = 0; j < json[i].positions.length; j++)
         {
-			
-        	gmapscoordinates [i] [j] = new Array (10000);
-        	
+        	gmapscoordinates [i] [j] = new Array;
+
         	// Populate GMAPS array
-        	for (k = 0; k < gmapscoordinates. length; ++ k) {
-        		
-        		
-        		
-        		gmapscoordinates [i] [j] [0] = json[i].positions[j].lat;
-        		gmapscoordinates [i] [j] [1] = json[i].positions[j].long;
-        		
-        	}
+
+        			gmapscoordinates [i] [j] [0] = json[i].positions[j].lat;
+            		gmapscoordinates [i] [j] [1] = json[i].positions[j].long;
+            		//gmapscoordinates [i] [j] [1] = json[i].positions[j].session;
+        	
         }
     }
 }
 
+// Filter session
+//comming soon
 
 map = new GMaps({
     el: '#map',
