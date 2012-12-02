@@ -12,11 +12,12 @@
 $(document).ready(function() {
 
 // Shortcut get JSON & add to javascript var
-<?php $message = file_get_contents('http://martinpoulsen.pythonanywhere.com/positions/json/get_all_locations/'); ?>
+<?php $message = file_get_contents('http://martinpoulsen.pythonanywhere.com/positions/json/get_all_session_locations/' . $_GET["session"] . ''); ?>
 var json = <?php echo $message; ?>;
 
 // Make new array for GMAPS
 gmapscoordinates = new Array;
+
 var map;
 var map2;
 
@@ -36,16 +37,12 @@ for(var i = 0; i < json.length; i++)
 
         	// Populate GMAPS array
 
-        			gmapscoordinates [i] [j] [0] = json[i].positions[j].lat;
-            		gmapscoordinates [i] [j] [1] = json[i].positions[j].long;
-            		//gmapscoordinates [i] [j] [1] = json[i].positions[j].session;
-        	
+				gmapscoordinates [i] [j] [0] = json[i].positions[j].lat;
+	            gmapscoordinates [i] [j] [1] = json[i].positions[j].long;
+
         }
     }
 }
-
-// Filter session
-//comming soon
 
 map = new GMaps({
     el: '#map',
