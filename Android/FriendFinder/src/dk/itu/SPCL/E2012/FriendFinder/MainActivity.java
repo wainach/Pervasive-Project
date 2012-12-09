@@ -2,18 +2,19 @@ package dk.itu.SPCL.E2012.FriendFinder;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.UUID;
 
-import org.pielot.openal.Buffer;
 import org.pielot.openal.SoundEnv;
 import org.pielot.openal.Source;
 
 import android.app.Activity;
 import android.content.Context;
+import android.hardware.GeomagneticField;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -48,6 +49,7 @@ public class MainActivity extends Activity implements Observer {
 	public long mLastOrientTS;
 	private float mOrientation;
 	public float mOrientation2;
+	private float magneticDeclination;
 
 	private String UUID; // Phone-specific id
 	private List<Friend> friends; // Friends represented by their phone's id
@@ -128,11 +130,18 @@ public class MainActivity extends Activity implements Observer {
 		} catch (Exception e) {
 			Log.e(TAG, "could not initialise OpenAL4Android", e);
 		}
+		
+		magneticDeclination = getGeomagneticDeclination();
 	}
 
 	// this.env.setListenerOrientation(20);
 	// this.lake1.setPosition(0,0,0);
 
+	private float getGeomagneticDeclination() {
+		GeomagneticField g = new GeomagneticField((float)55.659698162244496, (float)12.59107232093811, 38.5f, new Date().getTime());
+		return g.getDeclination();
+	}
+	
 	/*
 	 * GET UNIQUE ID FOR THIS DEVICE
 	 */
@@ -286,7 +295,9 @@ public class MainActivity extends Activity implements Observer {
 				mOrientAccuracy = accuracy;
 				mLastOrientTS = System.currentTimeMillis();
 
-				mOrientation = event.values[0];
+				Log.i("ORIENTATION", "Sensor input: " + Float.toString(event.values[0]));
+				mOrientation = event.values[0] - magneticDeclination;
+				Log.i("ORIENTATION", "After - magneticDeclination: " + Float.toString(mOrientation));
 				mOrientation2 = windowAvg(event.values[0]);
 
 				updateOrientation();
@@ -350,7 +361,7 @@ public class MainActivity extends Activity implements Observer {
 	private void updateOrientation() {
 		// listener orientation is the compass orientation
 		this.env.setListenerOrientation(mOrientation);
-		// Log.i("ORIENTATION", Float.toString(mOrientation));
+		Log.i("ORIENTATION", "Sent to OpenAL: " + Float.toString(mOrientation));
 
 		this.updateSoundOrientation();
 
