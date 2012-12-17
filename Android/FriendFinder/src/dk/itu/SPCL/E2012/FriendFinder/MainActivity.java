@@ -120,7 +120,7 @@ public class MainActivity extends Activity implements Observer {
 				}
 			}
 			
-			Calculator.calculateBearing(null);
+			//Calculator.calculateBearing(null);
 		}
 
 		// sound
