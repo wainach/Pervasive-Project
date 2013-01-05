@@ -395,7 +395,16 @@ public class MainActivity extends Activity implements Observer {
 						Log.i(TAG, "inducedBearing: " + inducedDirection);
 					}
 
-					currentBestLocation = location;
+					// DEBUG CONTROLLED TEST AT ITU:
+					double latitudeITU = 55.659698162244496;
+					double longitudeITU = 12.59107232093811;
+					
+					currentBestLocation = new Location("ITU");
+					currentBestLocation.setLatitude(latitudeITU);
+					currentBestLocation.setLongitude(longitudeITU);
+					currentBestLocation.setAltitude(0);
+					
+					//currentBestLocation = location;
 					Log.i(TAG, "new location is better");
 				}
 
@@ -404,20 +413,18 @@ public class MainActivity extends Activity implements Observer {
 				double alt = currentBestLocation.getAltitude();
 				Log.i(TAG, "A_lat: " + lat + " , A_lon: " + lon);
 
-				// Update listener position WITH ALTITUDE!
-				/*env.setListenerPos((float) lon * lonToMetricFactor, (float) lat
-						* latToMetricFactor, (float) alt * altToMetricFactor);*/
-				
+				// Update listener position - altitude = 0
 				
 				env.setListenerPos((float) lon * lonToMetricFactor, (float) lat
-				* latToMetricFactor, 0);
+						* latToMetricFactor, 0);
 				
 				
-				// For controlled test ITU position hardcoded
-				/*double latitudeITU = 55.659698162244496;
-				double longitudeITU = 12.59107232093811;
-				env.setListenerPos((float) longitudeITU * lonToMetricFactor, (float) latitudeITU
-				* latToMetricFactor, 0);*/
+				// Update listener position WITH ALTITUDE!
+				/*
+				env.setListenerPos((float) lon * lonToMetricFactor, (float) lat
+						* latToMetricFactor, (float) alt * altToMetricFactor);
+				*/
+				
 
 				// Post position to web service
 				String[] postData = new String[4];
@@ -590,7 +597,7 @@ public class MainActivity extends Activity implements Observer {
 	private void checkDistance() {
 
 		if (currentBestLocation != null) {
-        
+			
 			 // Iterate
 			 for (Friend f : friends) {
 				
